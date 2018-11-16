@@ -1,0 +1,101 @@
+---
+title: "Assignment Module 03"
+author: "Anthony Nguyen"
+date: "2018 10 10"
+output:
+  
+  pdf_document: default
+  html_document: 
+       theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Assignment Module 03 - Exchange Rates  
+
+> Search the Internet for the interest rate on one-year treasury bonds of the United States government. (Hint: Use “US treasury bond rates” as key words in search engines.) Do the same for an equivalent bond in a country of your choice other than the United States. (If you have difficulty, search for the lowest interest rate on the safest one-year assets in the country.)  
+> 
+> Then, record the interest rates in the US and your selected country along with the exchange rate of the two countries’ currencies for the most recent date on which all three numbers are available. Use those numbers and the interest parity condition to find the expected exchange rate for one year from the date.  
+> 
+> Finally, compare the expected exchange rate with the current spot rate and discuss why the selected country’s currency may be expected to appreciate or depreciate. Does that currency look more attractive to invest in than the US dollar? 
+> 
+> Respond to the prompt above in an essay of approximately 150 words.**  
+  
+***
+  
+US Treasury bond rates taken from [here](https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield) on 10 October 2018.  
+
+UK bond rates taken from [here](https://www.investing.com/rates-bonds/uk-government-bonds?maturity_from=40&maturity_to=290) on 11 October 2018.
+  
+Swiss government bond rates taken from [here](http://www.worldgovernmentbonds.com/country/switzerland/) on 10 October 2018.  
+
+```{r copy paste bond data into tables, include=FALSE}
+
+bonds_us <- data.frame(us_bonds = c("1_Mo",	"6_Mo", "1_Yr", "5_Yr",	"10_Yr", "20_Yr",	"30_Yr"), us_yields = c(2.17, 2.46, 2.65,	3.05,	3.21,	3.30,	3.37), stringsAsFactors = FALSE)
+
+bonds_uk <- data.frame(uk_bonds = c("1_Mo", "6_Mo", "1_Yr", "5_Yr",	"10_Yr", "20_Yr", "30_Yr"), uk_yields = c(0.730, 0.761, 0.825, 1.246, 1.723, 2.054, 2.081), stringsAsFactors = FALSE)  
+
+bonds_ch <- data.frame(ch_bonds = c("1_Mo", "6_Mo", "1_Yr", "5_Yr",	"10_Yr", "20_Yr", "30_Yr"), ch_yields = c(-0.900, -0.820, -0.770, -0.343, 0.105, 0.571, 0.687), stringsAsFactors = FALSE)  
+```
+
+```{r merge both US, UK and CH bond tables, echo=FALSE}
+bonds <- data.frame(bonds = bonds_us$us_bonds, us_yields = bonds_us$us_yields, uk_yields = bonds_uk$uk_yields, ch_yields = bonds_ch$ch_yields, stringsAsFactors = FALSE)
+bonds
+```
+
+[Exchange rate](https://www.oanda.com/currency/converter/) as of 10 October 2018:  
+  
+* 1 USD = 0.75885 GBP  
+* 1 USD = 0.99294 CHF
+
+To calculate the expected exchange rate $e^e$, assuming that parity holds, and that $e^f = e^e$:  
+
+$$
+(1 + i_{USD})e^e = (1 + i^*)e
+$$
+then
+$$
+e^e = e\cdot\frac{1 + i^*}{1 + i_{USD}}
+$$
+```{r calculate expected echange rates, include=FALSE}
+ee_gbp <- 0.75885*((1 + bonds$uk_yields/100)/(1 + bonds$us_yields/100))
+ee_chf <- 0.99294*((1 + bonds$ch_yields/100)/(1 + bonds$us_yields/100))
+```
+therefore, using the interest rate for a one year government bond, we would the expected exchange rate for USD to GBP to be:
+$$
+e^e_{GBP} = 0.75885\cdot\frac{1 + .00825}{1 + .0265}  
+$$
+```{r print expected exchange rate for GBP, echo=TRUE}
+ee_gbp
+```
+and for the the Swiss Franc, the expected exchange rate would be:
+$$
+e^e_{CHF} = 0.99294\cdot\frac{1 - .00770}{1 + .0265}  
+$$
+```{r print expected exchange rate for CHF, echo=TRUE}
+ee_chf
+```
+
+Which means the expected exchange rates for the respective currencies in one year would be: 
+  
+$e^e_{GBP} = 0.7453585$  
+$e^e_{CHF} = 0.9598581$  
+  
+  
+And to calculate the appreciation or depreciation of the USD after one year, we would use:
+$$
+\% change = \frac{e^e - e}{e}\cdot100
+$$
+```{r calculate appreciation/depreciation of currency after one year, include=FALSE}
+pctchange_usd_gbp <- ((ee_gbp - .75885)/.75885) * 100
+pctchange_usd_chf <- ((ee_chf - 0.99294)/0.99294) * 100
+```
+
+In other words, in one year's time the price of one USD in terms of GBP would depreciate by -1.778%, while one USD in terms of Swiss Franc would depreciate by -3.332%.    
+
+If interest parity holds and these calculated expected exchange rates are realized in one year's time, then, by definition, it shouldn't matter which currency we invest in.  
+
+All else being equal and judging by these figures alone, the immediate returns on the USD are greater, so it would seem to be a more attractive investment option.
+

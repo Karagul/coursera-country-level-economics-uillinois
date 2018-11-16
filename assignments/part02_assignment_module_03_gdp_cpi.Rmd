@@ -1,0 +1,127 @@
+---
+title: "Long-run economic performance: GDP growth vs. inflation in Switzerland"
+subtitle: <h3>Coursera/U.Illinois, Country-level economics</h3>
+author: "Anthony Nguyen"
+date: "2018 11 07"
+output:
+  html_document: 
+       theme: journal
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggthemes)
+load("../rda/gdp_cpi_ch.rda")
+```
+  
+#Questions
+ 
+Go to the World Bank's databases at the World DataBank website and select the [World Development Indicators database](http://databank.worldbank.org/data/databases.aspx). Choose a country of your interest from the Country menu and download its GDP growth and CPI inflation data for the years since 1980 by using the checkbox options under the Series and Time menus. (If these data are missing for the country that you have selected, please choose another country.)  
+
+##Part 1
+
+Put the two series into one graph, as in the last slide of the lecture video 3-2.4. Applying the Macroeconomic Model to the Analysis of US Economy.
+
+##Part 2
+
+Look at your graph and identify periods of high GDP growth (half a standard deviation or more above average for the entire length of the data) and negative GDP growth. Also, identify periods of high inflation (above 8 percent). Examine the relationship of GDP growth and inflation during the identified periods and figure out whether the country experienced an aggregate demand or aggregate supply shock. Additionally, try to read about the country online and see if you can identify the source of each shock.
+
+***  
+  
+#Answers  
+
+##Part 1  
+
+```{r prepare data, include=FALSE}
+gdp_cpi_ch_long <- gdp_cpi_ch %>% gather("Measure", "Annual %", `GDP growth`:`Interest, short-term avg.`)
+```
+
+```{r plot data, echo = FALSE}
+gdp_cpi_plot01 <- gdp_cpi_ch_long %>% filter(!str_detect(gdp_cpi_ch_long$Measure, "Interest")) %>% 
+  ggplot(aes(x = Year, y = `Annual %`, color = Measure)) + 
+  geom_line(size = 1.0, na.rm = TRUE) +
+  theme_economist() +
+  scale_x_continuous(breaks = seq(1981, 2017, by = 2)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_y_continuous(breaks = seq(-2.5, 6.5, by = 1)) +
+  geom_hline(yintercept=0, linetype="dotted", color = "red") +
+  ggtitle("Swiss GDP growth vs. inflation rate, 1980 - 2017")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(legend.title=element_blank()) +
+  theme(legend.text=element_text(size=rel(1.0)))
+
+gdp_cpi_plot01
+  
+```
+
+```{r save plot image, include=FALSE}
+ggsave("../figs/gdp_cpi_plot01.png")
+```
+In addition to plotting the data, we can quickly summarize the distribution for GDP growth in Switzerland from 1980 to 2017:  
+```{r summarize GDP growth, echo=FALSE}
+
+summary(gdp_cpi_ch$`GDP growth`, na.rm = TRUE)
+  
+print(paste("std.dev:", sd(gdp_cpi_ch$`GDP growth`, na.rm = TRUE)))
+```
+And we can summarize CPI inflation rates in Switzerland from 1980 to 2017:
+```{r summarize CPI inflation rate, echo = FALSE}
+
+summary(gdp_cpi_ch$`Inflation, CPI`)
+  
+print(paste("std.dev:", sd(gdp_cpi_ch$`Inflation, CPI`)))
+```
+\pagebreak  
+ 
+##Part 2    
+  
+Looking at the above graph, we can see that, overall, the range of high and low values for both GDP growth and CPI inflation is less extreme than the compatible data we saw for the U.S. in the lecture video.  
+  
+With regard to GDP growth, the average growth rate in Switzerland from 1980 to 2017 was 1.72%, with a standard deviation of 1.59%.  The periods of highest GDP growth were the mid- to late-1980s, the late 1990s, and the mid-2000s just before the most recent global financial crisis.  
+  
+Conversely, GDP growth hit its lowest negative points in years 1982, 1991 and 2009, with the year 2009 being the lowest point at -2.22% GDP growth.
+  
+With regards to the CPI inflation rate, we can see from looking at the graph the the inflation rate seems to largely move in the same direction as GDP growth, and that, overall, has tended to lower and lower levels of inflation over time (even culminating with negative inflation from 2011-2016).  Over the period between 1980 to 2017, the average rate of inflation in Switzerland is about 1.70%, with peaks of greater than 5% in the early 1980s and 1990s, followed by a steadily declining rate until the present.  
+  
+While it is not entirely clear all the reasons for these rises and dips in GDP growth, at least for some of these changes, the following external shocks can be identified[^1]:
+  
+* *Late 1980s-early 1990s*: U.S. stock market crash (1987), fallout from German re-unification and tensions in the European Monetary System led to slowing GDP.  
+* *Late 1990s-early 2000s*: the build of the dot.com bubble economy in the mid- to  late-1990s, followed by the bursting of the bubble in 2000-2002.  
+* *2008-2009*: the fall of Lehman Bros. and the subsequent global financial crisis leading to the lowest GDP growth rate and recession of the Swiss economy during this time period.  
+  
+Further analysis on the supply and demand shocks to the Swiss economy during this time period have demonstrated that the relative importance of supply shocks and demand shocks have changed over time, with demand shocks being responsible for driving the low inflation rates seen in the Swiss economy after 2008.
+
+Looking over a longer time horizon, it has also been shown that shocks to the Swiss economy have declined in magnitude over time, and that "surprisingly, the global financial crisis represented a much smaller shock than either of the World Wars, the deflation of the 1920s, or the Great Depression."
+  
+***  
+  
+  
+\pagebreak  
+
+Lastly, we can also look at the average short-term interest rate for each year to see how the Swiss National Bank responded to the GDP growth and inflation rate fluctuations [^2].
+
+```{r plot data including the short-term interest rates, echo = FALSE }
+gdp_cpi_ch_long %>%  
+  ggplot(aes(x = Year, y = `Annual %`, color = Measure)) + 
+  geom_line(size = 1.0, na.rm = TRUE) +
+  theme_economist() +
+  scale_x_continuous(breaks = seq(1981, 2017, by = 2)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_y_continuous(breaks = seq(-2.5, 9.5, by = 1)) +
+  geom_hline(yintercept=0, linetype="dotted", color = "red") +
+  ggtitle("Swiss GDP growth vs. inflation rate, 1980 - 2017")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(legend.title=element_blank()) +
+  theme(legend.text=element_text(size=rel(1.0)))
+```  
+  
+Looking at this graph, we can see that the interest rate line moves very closely  with the inflation rate, which we would expect given the [Taylor Rule](https://en.wikipedia.org/wiki/Taylor_rule).  
+  
+  
+    
+[^1]: Additional analysis on supply and demand shocks in Switzerland over time taken from paper by [Rebecca Stuart, Central Bank of Ireland, 2017](http://rebeccastuart.net/wp-content/uploads/2018/01/Swiss-AS-and-AD-Jun-6.pdf).
+
+[^2]: Short term interest rate data provided by [OECD](https://data.oecd.org/interest/short-term-interest-rates.htm#indicator-chart), accessed on 8 Nov. 2018.
+

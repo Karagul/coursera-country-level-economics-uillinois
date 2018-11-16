@@ -1,0 +1,117 @@
+---
+title: "Assignment Module 01"
+author: "Anthony Nguyen"
+date: "2018 09 25"
+output:
+  html_document: 
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+load(file = "../rda/jv_seco.rda")
+load(file = "../rda/ue_seco.rda")
+load(file = "../rda/wdi_extract.rda")
+```
+
+###Assignment Module 01 - Unemployment Figures
+  
+* How has the rate of unemployment changed in your country?  
+
+* Has the trend been mostly because of changes in the number of jobs or due to changes in labor force participation?  
+
+* To what extent have these trends and changes been similar or different for women and men in your country?  
+
+***
+###Sources:
+
+Official Swiss unemployment data used in this analysis was downloaded directly from the State Secretariat for Economic Affairs (SECO), through the [AMSTAT unemployment statistics portal](https://www.amstat.ch/v2/fr/index.html), accessed on 26 sep.2018.
+
+ILO-model unemployment data and comparative unemployment data between countries used in this anaylsis was downloaded directly from the [World Bank DataBank](http://databank.worldbank.org/data/home), accessed on 25 Sep. 2018. 
+
+***
+###How has the rate of unemployment changed in your country?  
+
+```{r plot rate of unemployment in Switzerland over time, echo=FALSE}
+
+CH_total_ue_rate <- ue_seco %>% filter(Gender == "Total") %>% 
+  group_by(Year) %>% summarize("Pct.unemployed" = mean(Pct.unemployed)) 
+
+CH_total_ue_rate %>%  ggplot(aes(x = Year, y = Pct.unemployed, group = 1)) + 
+  geom_line() +
+  theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Swiss unemployment rate, 2000-2017 (SECO)")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Year") + 
+  ylab("Unemployment rate, National estimate (%)") 
+ 
+```
+```{r print summary statistics, echo=FALSE}
+summary(CH_total_ue_rate)
+```
+
+From Jan.2000 to the present, the rate of official (nationally calculated) unemployment in Switzerland has remained relatively constant, somwhere between 2.8 to 3.5 percent roughly.  This rate fluctuates from month to month, but has more or less remained within this band the past two decades.  The average rate of unemployment during this time has been 3.1%.
+
+The Swiss Federal Statistics office produces many reports on this subject, and according to their 2017 report, the unemployment rate for men and women are nearly the same, with having only a tenth of percentage points higher rates.
+
+https://www.bfs.admin.ch/bfsstatic/dam/assets/3644401/master
+
+When we look at the ILO data, they reportshigher unemployment rates for Switzerland than what we see from the data from the Swiss national statistics office.  This is perhaps due to the fact that nationally, Switzerland only uses *registered unemployed* in its official figures. The figure below shows the ILO data:
+
+```{r convert relevant columns to numeric, include=FALSE}
+wdi_extract[ ,3:ncol(wdi_extract)] <- sapply(wdi_extract[ ,3:ncol(wdi_extract)],as.numeric)
+```
+
+```{r plot ILO vs National estimates for Switzerland, echo = FALSE}
+wdi_ue_ch <- wdi_extract %>% filter(`Country Name`=="Switzerland", Year > 2010) %>%
+    mutate(National.estimate = `Unemployment, total (% of total labor force) (national estimate)`, ILO.estimate = `Unemployment, total (% of total labor force) (modeled ILO estimate)`) %>%
+  select(Year, National.estimate, ILO.estimate) %>% 
+  gather(Source, Pct.unemployed, National.estimate:ILO.estimate)
+  
+wdi_ue_ch %>% ggplot(aes(x = Year, y = Pct.unemployed, group = Source, color = Source)) +
+  geom_line() +
+  theme_light() +
+  ggtitle("Swiss unemployment rate, 2000-2017 (ILO)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+```
+
+Lastly, using the ILO database, we can compare Switzerland to other benchmark OECD countries of comparible size and/or level of development, to see how the trends compare over this time period:
+
+```{r plot country comparison, echo = FALSE}
+wdi_extract %>% filter(c("Austria", "Switzerland", "France", "Germany") %in% `Country Name`, Year >= 1990) %>% 
+  ggplot(aes(x = Year, y = `Unemployment, total (% of total labor force) (modeled ILO estimate)`, color = `Country Name`)) + 
+  geom_line(na.rm = TRUE) +
+  theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Unemployment rate, 2000-2017 (ILO)")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Year") + 
+  ylab("Unemployment rate, ILO model (%)") 
+```
+From this plot we can see there are certainly some differences between Switzerland with other benchmark countries.  In particular, we can see there was a notable spike in unemployment in Germany in 2005 that was quite pronounced compared to the others.  Without going into details of how each countries trend compared to other over the given time period, perhaps it is more instructive to look at the distribution of each country's unemployment rate over the period we are interested in, which we can plot as below: 
+
+```{r boxplots of unemployment rate distributions over time, echo = FALSE }
+wdi_extract %>% select(`Country Name`, `Unemployment, total (% of total labor force) (modeled ILO estimate)`) %>% 
+  group_by(`Country Name`) %>% 
+  ggplot(aes(`Country Name`, y = `Unemployment, total (% of total labor force) (modeled ILO estimate)`, color = `Country Name`)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme_light() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Unemployment rate distribution, 2000-2017 (ILO)")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Year") + 
+  ylab("Unemployment rate, ILO model (%)") +
+  theme(legend.position="none")
+```
+  
+In this plot,several things jump out:  
+  
+The average unemployment rate, along with the variance of the unemployment rate, is lowest in the the two smallest countries in this analysis--namely, Switzerland and Austria.  
+  
+France has maintained the largest average unemployment rate over between 2000-2017, and German has had both a high average unemployment rate alongside the largest swings in the unemployment rate during this time period.  The UK and US have had roughly simlar unemployment averages (though higher than Switzerland), though the variance in the UK has been greater during this time.  
+
+All in all, from what we can see from this small comparison, Switzerland has had the lowest and most stable unemployment rates among the countries compared in this analysis from 2000 to 2017. 
+
+

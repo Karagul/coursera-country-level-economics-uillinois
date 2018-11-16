@@ -1,0 +1,39 @@
+In the scenario described, where a company wants to borrow money during 
+the course of a year to expand its production facilities, knowing that 
+the Federal Reserve plans to reduce the U.S. money supply during this 
+time implies several things:  
+  
+1. In the IS-LM model, when the money supply (M^s) decreases, the LM 
+curve rotates upwards (or shifting to the left).  
+  
+2. Similarly, a decrease in the money supply, does not necessarily 
+imply a shift in the IS curve, so it would remain the same. This is 
+because the money supply does not directly influence the relationship 
+between interest rate (i) and income level (Y).  The money supply does 
+affect the interest rate itself, but it does so by causing a change 
+*along* the IS curve and not a shift in the curve.  
+  
+3. When plotting the IS and LM curves, we can see that rotating the LM 
+curve upwards (or shifting it left, if you prefer) means that the 
+equilibrium interest rate will necessarily increase. Intuitively, we can 
+understand this increase in interest rate as the result of the Fed 
+selling more bonds/securities to its member banks, which has the effect 
+of decreasing the amount of money these banks have in reserve, which in 
+turn allows banks to raise the interest rate to attract savings to 
+compensate.   
+
+4. Looking at the same graph, we also can see that the equilibrium GDP 
+value would also decrease.  Following the increase in interest 
+rate--which can also be thought of as the cost of borrowing 
+money--investment would decrease.  Similarly, as the interest rate 
+increases, the exchange rate would also increase, and net exports, in 
+theory, would potentially suffer.  All of this would lead to lower 
+income or GDP.  
+  
+5. All this being said, if the company decided to go ahead with its 
+plans to take out loans during the current year, this could very much 
+hurt profits knowing that the cost of borrowing this money would be 
+higher and that economic activity in the form of GDP would be lower 
+during this time.  As the Fed intends to return the money supply to it 
+current path the following year, it would be better to wait and begin 
+the project then. 
