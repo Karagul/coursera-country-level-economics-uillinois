@@ -5,7 +5,7 @@ courses, part of the University of Illinois (Prof. Hadi
 Salehi Esfahani) 'Managerial Economics and Business 
 Analysis Specialization' on Coursera.  
   
-Part 1: 
+Part 1:  
 [Country Level Economics: Macroecnomic Variables and 
 Markets](https://www.coursera.org/learn/country-level-economics)
   
